@@ -26,7 +26,7 @@ const initialPlayers: Player[] = [
   { id: 2, name: 'Mage', hp: 70, maxHp: 70, mana: 100, maxMana: 100, stunDuration: 0, summonDuration: 0 },
   { id: 3, name: 'Prêtre', hp: 80, maxHp: 80, mana: 80, maxMana: 80, stunDuration: 0, summonDuration: 0 },
   { id: 4, name: 'Voleur', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0 },
-  { id: 5, name: 'Druide', hp: 85, maxHp: 85, mana: 70, maxMana: 70, stunDuration: 0, summonDuration: 0 },
+  { id: 5, name: 'Vor', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0 }
 ];
 
 const initialEnemies: Enemy[] = [
@@ -118,31 +118,43 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-gradient-to-b from-amber-900/90 to-amber-950/95 p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 bg-gradient-to-b from-amber-900/80 to-amber-950/90 p-6 rounded-lg border-4 border-yellow-900/60 shadow-[inset_0_0_20px_rgba(0,0,0,0.6)]">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Gestionnaire RPG</h1>
-            <p className="text-lg text-gray-600 mt-2">Tour actuel: {currentTurn}</p>
+            <h1 className="text-4xl font-medievalsharp text-yellow-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+              Gestionnaire RPG
+            </h1>
+            <p className="text-lg text-yellow-100/90 mt-2 font-cinzel">
+              Tour actuel: {currentTurn}
+            </p>
           </div>
           <div className="space-x-4">
             <button
               onClick={handleNextTurn}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="px-4 py-2 bg-blue-900/80 text-yellow-100 rounded
+                border-2 border-blue-800/50 hover:bg-blue-800/80
+                active:bg-blue-700/80 transition-colors duration-200
+                font-cinzel shadow-lg hover:shadow-blue-900/50"
             >
-              Tour suivant
+              ⚔️ Tour suivant
             </button>
             <button
               onClick={handleReset}
-              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+              className="px-4 py-2 bg-red-900/80 text-yellow-100 rounded
+                border-2 border-red-800/50 hover:bg-red-800/80
+                active:bg-red-700/80 transition-colors duration-200
+                font-cinzel shadow-lg hover:shadow-red-900/50"
             >
-              Réinitialiser
+              🔄 Réinitialiser
             </button>
           </div>
         </div>
 
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Ennemis</h2>
+          <h2 className="text-3xl font-medievalsharp text-yellow-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mb-4">
+            Ennemis
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {enemies.map(enemy => (
               <EnemyCard
@@ -156,7 +168,9 @@ function App() {
         </div>
 
         <div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Joueurs</h2>
+          <h2 className="text-3xl font-medievalsharp text-yellow-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mb-4">
+            Joueurs
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {players.map(player => (
               <PlayerCard
