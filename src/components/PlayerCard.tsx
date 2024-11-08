@@ -23,7 +23,7 @@ export default function PlayerCard({...props}: PlayerCardProps) {
   const [showManaAlert, setShowManaAlert] = useState(false);
 
   const isStunned = props.stunDuration > 0;
-  const hasSummon = props.summonDuration > 0;
+  // const hasSummon = props.summonDuration > 0;
 
   const handleManaChange = (change: number) => {
     if (props.mana + change < 0) {
