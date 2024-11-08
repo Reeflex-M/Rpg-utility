@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  base: '/Rpg-utility/',
-  plugins: [react()]
+  plugins: [react()],
+  base: '/Rpg-utility/' // Doit correspondre au nom de votre dépôt
 });
