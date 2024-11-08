@@ -10,7 +10,7 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
-  "homepage": "https://Reeflex_M.github.io/Rpg-utility",
+  "homepage": "https://reeflex-m.github.io/Rpg-utility/",
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
