@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PlayerCard from './components/PlayerCard';
 import EnemyCard from './components/EnemyCard';
 
@@ -22,10 +22,10 @@ interface Enemy {
 }
 
 const initialPlayers: Player[] = [
-  { id: 1, name: 'Guerrier', hp: 100, maxHp: 100, mana: 50, maxMana: 50, stunDuration: 0, summonDuration: 0 },
-  { id: 2, name: 'Mage', hp: 70, maxHp: 70, mana: 100, maxMana: 100, stunDuration: 0, summonDuration: 0 },
-  { id: 3, name: 'Prêtre', hp: 80, maxHp: 80, mana: 80, maxMana: 80, stunDuration: 0, summonDuration: 0 },
-  { id: 4, name: 'Voleur', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0 },
+  { id: 1, name: 'Aragorn', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0 },
+  { id: 2, name: 'Legolas', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0 },
+  { id: 3, name: 'Gimli', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0 },
+  { id: 4, name: 'Gandalf', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0 },
   { id: 5, name: 'Vor', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0 }
 ];
 
@@ -37,9 +37,24 @@ const initialEnemies: Enemy[] = [
 ];
 
 function App() {
-  const [players, setPlayers] = useState<Player[]>(initialPlayers);
+  const [players, setPlayers] = useState<Player[]>(() => {
+    const savedPlayers = localStorage.getItem('players');
+    return savedPlayers ? JSON.parse(savedPlayers) : initialPlayers;
+  });
   const [enemies, setEnemies] = useState<Enemy[]>(initialEnemies);
   const [currentTurn, setCurrentTurn] = useState<number>(1);
+  const [showAddPlayer, setShowAddPlayer] = useState(false);
+  const [newPlayer, setNewPlayer] = useState({
+    name: '',
+    hp: 75,
+    maxHp: 75,
+    mana: 60,
+    maxMana: 60
+  });
+
+  useEffect(() => {
+    localStorage.setItem('players', JSON.stringify(players));
+  }, [players]);
 
   const handlePlayerHpChange = (playerId: number, change: number) => {
     setPlayers(players.map(player => {
@@ -117,6 +132,30 @@ function App() {
     setCurrentTurn(1);
   };
 
+  const handleAddPlayer = () => {
+    if (newPlayer.name.trim()) {
+      const playerToAdd: Player = {
+        id: players.length + 1,
+        ...newPlayer,
+        stunDuration: 0,
+        summonDuration: 0
+      };
+      setPlayers([...players, playerToAdd]);
+      setNewPlayer({
+        name: '',
+        hp: 75,
+        maxHp: 75,
+        mana: 60,
+        maxMana: 60
+      });
+      setShowAddPlayer(false);
+    }
+  };
+
+  const handlePlayerRemove = (id: number) => {
+    setPlayers(players.filter(player => player.id !== id));
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-900/90 to-amber-950/95 p-8">
       <div className="max-w-6xl mx-auto">
@@ -147,6 +186,15 @@ function App() {
                 font-cinzel shadow-lg hover:shadow-red-900/50"
             >
               🔄 Réinitialiser
+            </button>
+            <button
+              onClick={() => setShowAddPlayer(true)}
+              className="px-4 py-2 bg-green-900/80 text-yellow-100 rounded
+                border-2 border-green-800/50 hover:bg-green-800/80
+                active:bg-green-700/80 transition-colors duration-200
+                font-cinzel shadow-lg hover:shadow-green-900/50"
+            >
+              👥 Nouveau Joueur
             </button>
           </div>
         </div>
@@ -180,11 +228,93 @@ function App() {
                 onManaChange={handleManaChange}
                 onStun={handlePlayerStun}
                 onSummon={handleSummon}
+                onPlayerRemove={handlePlayerRemove}
               />
             ))}
           </div>
         </div>
       </div>
+      {showAddPlayer && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-gradient-to-b from-amber-50/95 to-amber-100/90 p-6 rounded-lg border-4 border-amber-200/60 shadow-lg w-96">
+            <h2 className="text-2xl font-medievalsharp text-slate-800 mb-4">Créer un Personnage</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-slate-700 font-cinzel mb-1">Nom</label>
+                <input
+                  type="text"
+                  value={newPlayer.name}
+                  onChange={(e) => setNewPlayer({...newPlayer, name: e.target.value})}
+                  className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded 
+                    border-2 border-slate-200 focus:ring-2 
+                    focus:ring-amber-400 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-cinzel mb-1">Points de Vie Max</label>
+                <input
+                  type="number"
+                  value={newPlayer.maxHp}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    setNewPlayer({
+                      ...newPlayer, 
+                      maxHp: value,
+                      hp: value
+                    });
+                  }}
+                  className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded 
+                    border-2 border-slate-200 focus:ring-2 
+                    focus:ring-amber-400 focus:outline-none"
+                  min="1"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-cinzel mb-1">Mana Max</label>
+                <input
+                  type="number"
+                  value={newPlayer.maxMana}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    setNewPlayer({
+                      ...newPlayer, 
+                      maxMana: value,
+                      mana: value
+                    });
+                  }}
+                  className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded 
+                    border-2 border-slate-200 focus:ring-2 
+                    focus:ring-amber-400 focus:outline-none"
+                  min="0"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                onClick={() => setShowAddPlayer(false)}
+                className="px-4 py-2 bg-slate-500 text-white rounded
+                  hover:bg-slate-600 active:bg-slate-700
+                  transition-colors duration-200 font-cinzel"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleAddPlayer}
+                className="px-4 py-2 bg-green-500 text-white rounded
+                  hover:bg-green-600 active:bg-green-700
+                  transition-colors duration-200 font-cinzel"
+                disabled={!newPlayer.name.trim()}
+              >
+                Créer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
