@@ -36,12 +36,15 @@ const initialEnemies: Enemy[] = [
   { id: 4, name: 'Sorcier Noir', hp: 80, maxHp: 80, stunDuration: 0 },
 ];
 
-function App() {
+export default function App() {
   const [players, setPlayers] = useState<Player[]>(() => {
     const savedPlayers = localStorage.getItem('players');
     return savedPlayers ? JSON.parse(savedPlayers) : initialPlayers;
   });
-  const [enemies, setEnemies] = useState<Enemy[]>(initialEnemies);
+  const [enemies, setEnemies] = useState<Enemy[]>(() => {
+    const savedEnemies = localStorage.getItem('enemies');
+    return savedEnemies ? JSON.parse(savedEnemies) : initialEnemies;
+  });
   const [currentTurn, setCurrentTurn] = useState<number>(1);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [newPlayer, setNewPlayer] = useState({
@@ -51,10 +54,19 @@ function App() {
     mana: 60,
     maxMana: 60
   });
+  const [showAddEnemy, setShowAddEnemy] = useState(false);
+  const [newEnemy, setNewEnemy] = useState({
+    name: '',
+    maxHp: 50
+  });
 
   useEffect(() => {
     localStorage.setItem('players', JSON.stringify(players));
   }, [players]);
+
+  useEffect(() => {
+    localStorage.setItem('enemies', JSON.stringify(enemies));
+  }, [enemies]);
 
   const handlePlayerHpChange = (playerId: number, change: number) => {
     setPlayers(players.map(player => {
@@ -156,6 +168,24 @@ function App() {
     setPlayers(players.filter(player => player.id !== id));
   };
 
+  const handleAddEnemy = () => {
+    if (newEnemy.name.trim()) {
+      const enemyToAdd: Enemy = {
+        id: enemies.length + 1,
+        name: newEnemy.name,
+        hp: newEnemy.maxHp,
+        maxHp: newEnemy.maxHp,
+        stunDuration: 0
+      };
+      setEnemies([...enemies, enemyToAdd]);
+      setNewEnemy({
+        name: '',
+        maxHp: 50
+      });
+      setShowAddEnemy(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-900/90 to-amber-950/95 p-8">
       <div className="max-w-6xl mx-auto">
@@ -196,6 +226,15 @@ function App() {
             >
               👥 Nouveau Joueur
             </button>
+            <button
+              onClick={() => setShowAddEnemy(true)}
+              className="px-4 py-2 bg-red-900/80 text-yellow-100 rounded
+                border-2 border-red-800/50 hover:bg-red-800/80
+                active:bg-red-700/80 transition-colors duration-200
+                font-cinzel shadow-lg hover:shadow-red-900/50"
+            >
+              👹 Nouvel Ennemi
+            </button>
           </div>
         </div>
 
@@ -210,6 +249,7 @@ function App() {
                 {...enemy}
                 onHpChange={handleEnemyHpChange}
                 onStun={handleEnemyStun}
+                onAddEnemy={handleAddEnemy}
               />
             ))}
           </div>
@@ -315,8 +355,66 @@ function App() {
           </div>
         </div>
       )}
+      {showAddEnemy && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-gradient-to-b from-amber-50/95 to-amber-100/90 p-6 rounded-lg border-4 border-amber-200/60 shadow-lg w-96">
+            <h2 className="text-2xl font-medievalsharp text-slate-800 mb-4">Créer un Ennemi</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-slate-700 font-cinzel mb-1">Nom</label>
+                <input
+                  type="text"
+                  value={newEnemy.name}
+                  onChange={(e) => setNewEnemy({...newEnemy, name: e.target.value})}
+                  className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded 
+                    border-2 border-slate-200 focus:ring-2 
+                    focus:ring-amber-400 focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-700 font-cinzel mb-1">Points de Vie Max</label>
+                <input
+                  type="number"
+                  value={newEnemy.maxHp}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value);
+                    setNewEnemy({
+                      ...newEnemy, 
+                      maxHp: value
+                    });
+                  }}
+                  className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded 
+                    border-2 border-slate-200 focus:ring-2 
+                    focus:ring-amber-400 focus:outline-none"
+                  min="1"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                onClick={() => setShowAddEnemy(false)}
+                className="px-4 py-2 bg-slate-500 text-white rounded
+                  hover:bg-slate-600 active:bg-slate-700
+                  transition-colors duration-200 font-cinzel"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleAddEnemy}
+                className="px-4 py-2 bg-green-500 text-white rounded
+                  hover:bg-green-600 active:bg-green-700
+                  transition-colors duration-200 font-cinzel"
+                disabled={!newEnemy.name.trim()}
+              >
+                Créer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
-export default App;
