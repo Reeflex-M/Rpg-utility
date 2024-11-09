@@ -186,6 +186,10 @@ export default function App() {
     }
   };
 
+  const handleEnemyRemove = (id: number) => {
+    setEnemies(enemies.filter(enemy => enemy.id !== id));
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-900/90 to-amber-950/95 p-8">
       <div className="max-w-6xl mx-auto">
@@ -249,7 +253,7 @@ export default function App() {
                 {...enemy}
                 onHpChange={handleEnemyHpChange}
                 onStun={handleEnemyStun}
-                onAddEnemy={handleAddEnemy}
+                onRemove={handleEnemyRemove}
               />
             ))}
           </div>
