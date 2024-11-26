@@ -9,22 +9,24 @@ interface PlayerCardProps {
   maxMana: number;
   stunDuration: number;
   summonDuration: number;
+  bleedDamage: number;
   onHpChange: (id: number, value: number) => void;
   onManaChange: (id: number, value: number) => void;
   onStun: (id: number, duration: number) => void;
   onSummon: (id: number, duration: number) => void;
+  onBleed: (id: number, damage: number) => void;
   onPlayerRemove: (id: number) => void;
 }
 
-export default function PlayerCard({...props}: PlayerCardProps) {
+export default function PlayerCard({ ...props }: PlayerCardProps) {
   const [hpAmount, setHpAmount] = useState<number>(10);
   const [manaAmount, setManaAmount] = useState<number>(10);
   const [stunTurns, setStunTurns] = useState<number>(1);
   const [summonTurns, setSummonTurns] = useState<number>(1);
+  const [bleedAmount, setBleedAmount] = useState<number>(1);
   const [showManaAlert, setShowManaAlert] = useState(false);
 
   const isStunned = props.stunDuration > 0;
-  // const hasSummon = props.summonDuration > 0;
 
   const handleManaChange = (change: number) => {
     if (props.mana + change < 0) {
@@ -50,7 +52,7 @@ export default function PlayerCard({...props}: PlayerCardProps) {
     `}>
       <div className="relative"> {/* Conteneur pour le positionnement */}
         {/* Bouton de suppression */}
-        <button 
+        <button
           onClick={() => props.onPlayerRemove(props.id)}
           className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center
             bg-red-500 hover:bg-red-600 active:bg-red-700
@@ -64,21 +66,31 @@ export default function PlayerCard({...props}: PlayerCardProps) {
         {/* Reste du contenu de la carte */}
         {/* ... */}
         <div className="relative">
-          <div className="flex justify-between items-start mb-6">
+          {/* Modification de la section des états */}
+          <div className="flex flex-col gap-2 mb-6">
             <h2 className="text-3xl font-medievalsharp text-slate-800 drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
               {props.name}
             </h2>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {isStunned && (
-                <span className="bg-red-100 text-red-800 px-4 py-1 rounded-full 
-                  text-sm font-cinzel border border-red-200 animate-pulse shadow-sm">
+                <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full 
+                  text-sm font-cinzel border border-red-200 animate-pulse shadow-sm
+                  whitespace-nowrap">
                   ⚔️ Immobilisé ({props.stunDuration})
                 </span>
               )}
               {props.summonDuration > 0 && (
-                <span className="bg-purple-100 text-purple-800 px-4 py-1 rounded-full 
-                  text-sm font-cinzel border border-purple-200 animate-pulse shadow-sm">
+                <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full 
+                  text-sm font-cinzel border border-purple-200 animate-pulse shadow-sm
+                  whitespace-nowrap">
                   🌟 Invocation ({props.summonDuration})
+                </span>
+              )}
+              {props.bleedDamage > 0 && (
+                <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full 
+                  text-sm font-cinzel border border-red-200 animate-pulse shadow-sm
+                  whitespace-nowrap">
+                  🩸 Saignement ({props.bleedDamage})
                 </span>
               )}
             </div>
@@ -90,7 +102,7 @@ export default function PlayerCard({...props}: PlayerCardProps) {
             </div>
 
             <div className="h-3 bg-slate-200 rounded-full border-2 border-slate-300 shadow-inner">
-              <div 
+              <div
                 className="h-full bg-gradient-to-r from-red-400 to-red-500 rounded-full
                   transition-all duration-300 relative overflow-hidden
                   before:absolute before:inset-0 before:bg-gradient-to-b 
@@ -99,86 +111,84 @@ export default function PlayerCard({...props}: PlayerCardProps) {
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <span className="font-cinzel text-slate-700">Mana: {props.mana}/{props.maxMana}</span>
-            </div>
+            <div className="flex items-center justify-between"></div>
+            <span className="font-cinzel text-slate-700">Mana: {props.mana}/{props.maxMana}</span>
+          </div>
 
-            <div className="h-3 bg-slate-200 rounded-full border-2 border-slate-300 shadow-inner">
-              <div 
-                className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full
+          <div className="h-3 bg-slate-200 rounded-full border-2 border-slate-300 shadow-inner">
+            <div
+              className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full
                   transition-all duration-300 relative overflow-hidden
                   before:absolute before:inset-0 before:bg-gradient-to-b 
                   before:from-white/20 before:to-transparent"
-                style={{ width: `${(props.mana / props.maxMana) * 100}%` }}
-              />
-            </div>
+              style={{ width: `${(props.mana / props.maxMana) * 100}%` }}
+            />
+          </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                type="number"
-                value={hpAmount}
-                onChange={(e) => setHpAmount(Math.max(1, parseInt(e.target.value) || 0))}
-                className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded 
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="number"
+              value={hpAmount}
+              onChange={(e) => setHpAmount(Math.max(1, parseInt(e.target.value) || 0))}
+              className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded 
                   border-2 border-slate-200 text-center focus:ring-2 
                   focus:ring-slate-400 focus:outline-none shadow-inner"
-                min="1"
-              />
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => props.onHpChange(props.id, -hpAmount)}
-                  className="w-24 px-4 py-2 bg-red-500 text-white rounded
+              min="1"
+            />
+            <div className="flex gap-2">
+              <button
+                onClick={() => props.onHpChange(props.id, -hpAmount)}
+                className="w-24 px-4 py-2 bg-red-500 text-white rounded
                     border hover:bg-red-600 active:bg-red-700 
                     transition-colors duration-200 font-cinzel shadow-sm"
-                  disabled={isStunned}
-                >
-                  -{hpAmount}
-                </button>
-                <button 
-                  onClick={() => props.onHpChange(props.id, hpAmount)}
-                  className="w-24 px-4 py-2 bg-green-500 text-white rounded
+              >
+                -{hpAmount}
+              </button>
+              <button
+                onClick={() => props.onHpChange(props.id, hpAmount)}
+                className="w-24 px-4 py-2 bg-green-500 text-white rounded
                     border hover:bg-green-600 active:bg-green-700
                     transition-colors duration-200 font-cinzel shadow-sm"
-                  disabled={isStunned}
-                >
-                  +{hpAmount}
-                </button>
-              </div>
+              >
+                +{hpAmount}
+              </button>
             </div>
+          </div>
 
-            {/* Contrôles de Mana */}
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                type="number"
-                value={manaAmount}
-                onChange={(e) => setManaAmount(Math.max(1, parseInt(e.target.value) || 0))}
-                className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded 
+          {/* Contrôles de Mana */}
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="number"
+              value={manaAmount}
+              onChange={(e) => setManaAmount(Math.max(1, parseInt(e.target.value) || 0))}
+              className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded 
                   border-2 border-slate-200 text-center focus:ring-2 
                   focus:ring-slate-400 focus:outline-none shadow-inner"
-                min="1"
-              />
-              <div className="flex gap-2 relative">
-                <button 
-                  onClick={() => handleManaChange(-manaAmount)}
-                  className="w-24 px-4 py-2 bg-blue-500 text-white rounded
+              min="1"
+            />
+            <div className="flex gap-2 relative">
+              <button
+                onClick={() => handleManaChange(-manaAmount)}
+                className="w-24 px-4 py-2 bg-blue-500 text-white rounded
                     border hover:bg-blue-600 active:bg-blue-700 
                     transition-colors duration-200 font-cinzel shadow-sm"
-                  disabled={isStunned}
-                >
-                  -{manaAmount}
-                </button>
-                <button 
-                  onClick={() => handleManaChange(manaAmount)}
-                  className="w-24 px-4 py-2 bg-blue-500 text-white rounded
+                disabled={isStunned}
+              >
+                -{manaAmount}
+              </button>
+              <button
+                onClick={() => handleManaChange(manaAmount)}
+                className="w-24 px-4 py-2 bg-blue-500 text-white rounded
                     border hover:bg-blue-600 active:bg-blue-700
                     transition-colors duration-200 font-cinzel shadow-sm"
-                  disabled={isStunned}
-                >
-                  +{manaAmount}
-                </button>
-                
-                {/* Alerte mana */}
-                {showManaAlert && (
-                  <div className="absolute -top-16 left-1/2 -translate-x-1/2 
+                disabled={isStunned}
+              >
+                +{manaAmount}
+              </button>
+
+              {/* Alerte mana */}
+              {showManaAlert && (
+                <div className="absolute -top-16 left-1/2 -translate-x-1/2 
                     bg-red-100/90 backdrop-blur-sm text-red-800 px-6 py-2 rounded-lg
                     border-2 border-red-200 font-cinzel text-sm whitespace-nowrap
                     animate-[fadeInOut_2s_ease-in-out] shadow-lg z-10
@@ -186,53 +196,72 @@ export default function PlayerCard({...props}: PlayerCardProps) {
                     before:w-4 before:h-4 before:bg-red-100/90 before:rotate-45
                     before:-translate-x-1/2 before:border-b-2 before:border-r-2
                     before:border-red-200">
-                    ⚡ Mana Insuffisant!
-                  </div>
-                )}
-              </div>
+                  ⚡ Mana Insuffisant!
+                </div>
+              )}
             </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                type="number"
-                value={stunTurns}
-                onChange={(e) => setStunTurns(Math.max(1, parseInt(e.target.value) || 0))}
-                className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="number"
+              value={stunTurns}
+              onChange={(e) => setStunTurns(Math.max(1, parseInt(e.target.value) || 0))}
+              className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded
                   border-2 border-slate-200 text-center focus:ring-2
                   focus:ring-slate-400 focus:outline-none shadow-inner"
-                min="1"
-              />
-              <button 
-                onClick={() => props.onStun(props.id, stunTurns)}
-                className="px-4 py-2 bg-slate-500 text-white rounded
+              min="1"
+            />
+            <button
+              onClick={() => props.onStun(props.id, stunTurns)}
+              className="px-4 py-2 bg-slate-500 text-white rounded
                   border hover:bg-slate-600 active:bg-slate-700
                   transition-colors duration-200 font-cinzel shadow-sm"
-                disabled={isStunned}
-              >
-                🗡️ Immobiliser
-              </button>
-            </div>
+              disabled={isStunned}
+            >
+              🗡️ Immobiliser
+            </button>
+          </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                type="number"
-                value={summonTurns}
-                onChange={(e) => setSummonTurns(Math.max(1, parseInt(e.target.value) || 0))}
-                className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="number"
+              value={summonTurns}
+              onChange={(e) => setSummonTurns(Math.max(1, parseInt(e.target.value) || 0))}
+              className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded
                   border-2 border-slate-200 text-center focus:ring-2
                   focus:ring-slate-400 focus:outline-none shadow-inner"
-                min="1"
-              />
-              <button 
-                onClick={() => props.onSummon(props.id, summonTurns)}
-                className="px-4 py-2 bg-purple-500 text-white rounded
+              min="1"
+            />
+            <button
+              onClick={() => props.onSummon(props.id, summonTurns)}
+              className="px-4 py-2 bg-purple-500 text-white rounded
                   border hover:bg-purple-600 active:bg-purple-700
                   transition-colors duration-200 font-cinzel shadow-sm"
-                disabled={isStunned || props.mana < 20}
-              >
-                🌟 Invoquer
-              </button>
-            </div>
+              disabled={isStunned || props.mana < 20}
+            >
+              🌟 Invoquer
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="number"
+              value={bleedAmount}
+              onChange={(e) => setBleedAmount(Math.max(1, parseInt(e.target.value) || 0))}
+              className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded
+                  border-2 border-slate-200 text-center focus:ring-2
+                  focus:ring-slate-400 focus:outline-none shadow-inner"
+              min="1"
+            />
+            <button
+              onClick={() => props.onBleed(props.id, bleedAmount)}
+              className="px-4 py-2 bg-red-500 text-white rounded
+                  border hover:bg-red-600 active:bg-red-700
+                  transition-colors duration-200 font-cinzel shadow-sm"
+            >
+              🩸 Saignement
+            </button>
           </div>
         </div>
       </div>

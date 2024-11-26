@@ -11,6 +11,7 @@ interface Player {
   maxMana: number;
   stunDuration: number;
   summonDuration: number;
+  bleedDamage: number;
 }
 
 interface Enemy {
@@ -19,21 +20,22 @@ interface Enemy {
   hp: number;
   maxHp: number;
   stunDuration: number;
+  bleedDamage: number;
 }
 
 const initialPlayers: Player[] = [
-  { id: 1, name: 'Aragorn', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0 },
-  { id: 2, name: 'Legolas', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0 },
-  { id: 3, name: 'Gimli', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0 },
-  { id: 4, name: 'Gandalf', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0 },
-  { id: 5, name: 'Vor', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0 }
+  { id: 1, name: 'Aragorn', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0, bleedDamage: 0 },
+  { id: 2, name: 'Legolas', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0, bleedDamage: 0 },
+  { id: 3, name: 'Gimli', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0, bleedDamage: 0 },
+  { id: 4, name: 'Gandalf', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0, bleedDamage: 0 },
+  { id: 5, name: 'Vor', hp: 75, maxHp: 75, mana: 60, maxMana: 60, stunDuration: 0, summonDuration: 0, bleedDamage: 0 }
 ];
 
 const initialEnemies: Enemy[] = [
-  { id: 1, name: 'Dragon', hp: 200, maxHp: 200, stunDuration: 0 },
-  { id: 2, name: 'Gobelin', hp: 50, maxHp: 50, stunDuration: 0 },
-  { id: 3, name: 'Troll', hp: 150, maxHp: 150, stunDuration: 0 },
-  { id: 4, name: 'Sorcier Noir', hp: 80, maxHp: 80, stunDuration: 0 },
+  { id: 1, name: 'Dragon', hp: 200, maxHp: 200, stunDuration: 0, bleedDamage: 0 },
+  { id: 2, name: 'Gobelin', hp: 50, maxHp: 50, stunDuration: 0, bleedDamage: 0 },
+  { id: 3, name: 'Troll', hp: 150, maxHp: 150, stunDuration: 0, bleedDamage: 0 },
+  { id: 4, name: 'Sorcier Noir', hp: 80, maxHp: 80, stunDuration: 0, bleedDamage: 0 },
 ];
 
 export default function App() {
@@ -125,15 +127,39 @@ export default function App() {
     }));
   };
 
+  const handleBleed = (id: number, damage: number, isEnemy: boolean) => {
+    if (isEnemy) {
+      setEnemies(enemies.map(enemy => {
+        if (enemy.id === id) {
+          return { ...enemy, bleedDamage: Math.max(0, (enemy.bleedDamage || 0) + damage) };
+        }
+        return enemy;
+      }));
+    } else {
+      setPlayers(players.map(player => {
+        if (player.id === id) {
+          return { ...player, bleedDamage: Math.max(0, (player.bleedDamage || 0) + damage) };
+        }
+        return player;
+      }));
+    }
+  };
+
   const handleNextTurn = () => {
     setCurrentTurn(prev => prev + 1);
+
+    // Apply bleed damage to players
     setPlayers(players.map(player => ({
       ...player,
+      hp: Math.max(0, player.hp - (player.bleedDamage || 0)),
       stunDuration: Math.max(0, player.stunDuration - 1),
       summonDuration: Math.max(0, player.summonDuration - 1)
     })));
+
+    // Apply bleed damage to enemies
     setEnemies(enemies.map(enemy => ({
       ...enemy,
+      hp: Math.max(0, enemy.hp - (enemy.bleedDamage || 0)),
       stunDuration: Math.max(0, enemy.stunDuration - 1)
     })));
   };
@@ -150,7 +176,8 @@ export default function App() {
         id: players.length + 1,
         ...newPlayer,
         stunDuration: 0,
-        summonDuration: 0
+        summonDuration: 0,
+        bleedDamage: 0
       };
       setPlayers([...players, playerToAdd]);
       setNewPlayer({
@@ -175,7 +202,8 @@ export default function App() {
         name: newEnemy.name,
         hp: newEnemy.maxHp,
         maxHp: newEnemy.maxHp,
-        stunDuration: 0
+        stunDuration: 0,
+        bleedDamage: 0
       };
       setEnemies([...enemies, enemyToAdd]);
       setNewEnemy({
@@ -254,6 +282,7 @@ export default function App() {
                 onHpChange={handleEnemyHpChange}
                 onStun={handleEnemyStun}
                 onRemove={handleEnemyRemove}
+                onBleed={(id, damage) => handleBleed(id, damage, true)}
               />
             ))}
           </div>
@@ -273,6 +302,7 @@ export default function App() {
                 onStun={handlePlayerStun}
                 onSummon={handleSummon}
                 onPlayerRemove={handlePlayerRemove}
+                onBleed={(id, damage) => handleBleed(id, damage, false)}
               />
             ))}
           </div>
@@ -282,14 +312,14 @@ export default function App() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-gradient-to-b from-amber-50/95 to-amber-100/90 p-6 rounded-lg border-4 border-amber-200/60 shadow-lg w-96">
             <h2 className="text-2xl font-medievalsharp text-slate-800 mb-4">Créer un Personnage</h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-slate-700 font-cinzel mb-1">Nom</label>
                 <input
                   type="text"
                   value={newPlayer.name}
-                  onChange={(e) => setNewPlayer({...newPlayer, name: e.target.value})}
+                  onChange={(e) => setNewPlayer({ ...newPlayer, name: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded 
                     border-2 border-slate-200 focus:ring-2 
                     focus:ring-amber-400 focus:outline-none"
@@ -304,7 +334,7 @@ export default function App() {
                   onChange={(e) => {
                     const value = parseInt(e.target.value);
                     setNewPlayer({
-                      ...newPlayer, 
+                      ...newPlayer,
                       maxHp: value,
                       hp: value
                     });
@@ -324,7 +354,7 @@ export default function App() {
                   onChange={(e) => {
                     const value = parseInt(e.target.value);
                     setNewPlayer({
-                      ...newPlayer, 
+                      ...newPlayer,
                       maxMana: value,
                       mana: value
                     });
@@ -363,14 +393,14 @@ export default function App() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-gradient-to-b from-amber-50/95 to-amber-100/90 p-6 rounded-lg border-4 border-amber-200/60 shadow-lg w-96">
             <h2 className="text-2xl font-medievalsharp text-slate-800 mb-4">Créer un Ennemi</h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-slate-700 font-cinzel mb-1">Nom</label>
                 <input
                   type="text"
                   value={newEnemy.name}
-                  onChange={(e) => setNewEnemy({...newEnemy, name: e.target.value})}
+                  onChange={(e) => setNewEnemy({ ...newEnemy, name: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded 
                     border-2 border-slate-200 focus:ring-2 
                     focus:ring-amber-400 focus:outline-none"
@@ -385,7 +415,7 @@ export default function App() {
                   onChange={(e) => {
                     const value = parseInt(e.target.value);
                     setNewEnemy({
-                      ...newEnemy, 
+                      ...newEnemy,
                       maxHp: value
                     });
                   }}
