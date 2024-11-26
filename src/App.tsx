@@ -255,6 +255,30 @@ export default function App() {
     setEnemies(enemies.filter(enemy => enemy.id !== id));
   };
 
+  const getOrderedCards = () => {
+    if (!gameStarted || turnOrder.length === 0) {
+      return {
+        players: players,
+        enemies: enemies
+      };
+    }
+
+    const orderedPlayers = turnOrder
+      .filter(entity => 'mana' in entity) // Filtre pour les joueurs
+      .map(player => players.find(p => p.id === player.id))
+      .filter(Boolean) as Player[];
+
+    const orderedEnemies = turnOrder
+      .filter(entity => !('mana' in entity)) // Filtre pour les ennemis
+      .map(enemy => enemies.find(e => e.id === enemy.id))
+      .filter(Boolean) as Enemy[];
+
+    return {
+      players: orderedPlayers,
+      enemies: orderedEnemies
+    };
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-900/90 to-amber-950/95 p-8">
       <div className="max-w-6xl mx-auto">
@@ -345,16 +369,21 @@ export default function App() {
             Ennemis
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {enemies.map(enemy => (
-              <EnemyCard
-                key={enemy.id}
-                {...enemy}
-                isActive={gameStarted && turnOrder[currentTurnIndex]?.id === enemy.id && turnOrder[currentTurnIndex]?.name === enemy.name}
-                onHpChange={handleEnemyHpChange}
-                onStun={handleEnemyStun}
-                onRemove={handleEnemyRemove}
-                onBleed={(id, damage) => handleBleed(id, damage, true)}
-              />
+            {getOrderedCards().enemies.map(enemy => (
+              <div key={enemy.id} className={`
+                ${gameStarted && turnOrder[currentTurnIndex]?.id === enemy.id && !('mana' in turnOrder[currentTurnIndex])
+                  ? 'animate-pulse shadow-[0_0_15px_5px_rgba(34,197,94,0.3)]'
+                  : ''}`}
+              >
+                <EnemyCard
+                  {...enemy}
+                  isActive={gameStarted && turnOrder[currentTurnIndex]?.id === enemy.id && !('mana' in turnOrder[currentTurnIndex])}
+                  onHpChange={handleEnemyHpChange}
+                  onStun={handleEnemyStun}
+                  onRemove={handleEnemyRemove}
+                  onBleed={(id, damage) => handleBleed(id, damage, true)}
+                />
+              </div>
             ))}
           </div>
         </div>
@@ -364,18 +393,23 @@ export default function App() {
             Joueurs
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {players.map(player => (
-              <PlayerCard
-                key={player.id}
-                {...player}
-                isActive={gameStarted && turnOrder[currentTurnIndex]?.id === player.id && turnOrder[currentTurnIndex]?.name === player.name}
-                onHpChange={handlePlayerHpChange}
-                onManaChange={handleManaChange}
-                onStun={handlePlayerStun}
-                onSummon={handleSummon}
-                onPlayerRemove={handlePlayerRemove}
-                onBleed={(id, damage) => handleBleed(id, damage, false)}
-              />
+            {getOrderedCards().players.map(player => (
+              <div key={player.id} className={`
+                ${gameStarted && turnOrder[currentTurnIndex]?.id === player.id && 'mana' in turnOrder[currentTurnIndex]
+                  ? 'animate-pulse shadow-[0_0_15px_5px_rgba(34,197,94,0.3)]'
+                  : ''}`}
+              >
+                <PlayerCard
+                  {...player}
+                  isActive={gameStarted && turnOrder[currentTurnIndex]?.id === player.id && 'mana' in turnOrder[currentTurnIndex]}
+                  onHpChange={handlePlayerHpChange}
+                  onManaChange={handleManaChange}
+                  onStun={handlePlayerStun}
+                  onSummon={handleSummon}
+                  onPlayerRemove={handlePlayerRemove}
+                  onBleed={(id, damage) => handleBleed(id, damage, false)}
+                />
+              </div>
             ))}
           </div>
         </div>
