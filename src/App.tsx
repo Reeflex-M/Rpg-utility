@@ -160,31 +160,31 @@ export default function App() {
   };
 
   const handleNextPlayer = () => {
-    setCurrentTurnIndex((prevIndex) => {
-      const newIndex = (prevIndex + 1) % turnOrder.length;
-      setCurrentPlayerName(turnOrder[newIndex].name);
-      return newIndex;
-    });
-  };
+    const nextIndex = (currentTurnIndex + 1) % turnOrder.length;
 
-  const handleNextRound = () => {
-    setCurrentRound(prev => prev + 1);
-    setCurrentTurnIndex(0); // Revenir au premier joueur
-    setCurrentPlayerName(turnOrder[0].name);
+    // Si on revient au premier joueur
+    if (nextIndex === 0) {
+      // Appliquer les effets de fin de tour
+      setPlayers(players.map(player => ({
+        ...player,
+        hp: Math.max(0, player.hp - (player.bleedDamage || 0)),
+        stunDuration: Math.max(0, player.stunDuration - 1),
+        summonDuration: Math.max(0, player.summonDuration - 1)
+      })));
 
-    // Apply bleed damage and other effects
-    setPlayers(players.map(player => ({
-      ...player,
-      hp: Math.max(0, player.hp - (player.bleedDamage || 0)),
-      stunDuration: Math.max(0, player.stunDuration - 1),
-      summonDuration: Math.max(0, player.summonDuration - 1)
-    })));
+      setEnemies(enemies.map(enemy => ({
+        ...enemy,
+        hp: Math.max(0, enemy.hp - (enemy.bleedDamage || 0)),
+        stunDuration: Math.max(0, enemy.stunDuration - 1)
+      })));
 
-    setEnemies(enemies.map(enemy => ({
-      ...enemy,
-      hp: Math.max(0, enemy.hp - (enemy.bleedDamage || 0)),
-      stunDuration: Math.max(0, enemy.stunDuration - 1)
-    })));
+      // Incrémenter le tour directement
+      setCurrentRound(currentRound + 1);
+    }
+
+    // Mettre à jour le nom du joueur actuel et l'index
+    setCurrentPlayerName(turnOrder[nextIndex].name);
+    setCurrentTurnIndex(nextIndex);
   };
 
   const handleReset = () => {
@@ -322,15 +322,6 @@ export default function App() {
                     font-cinzel shadow-lg hover:shadow-blue-900/50"
                 >
                   👤 Prochain joueur
-                </button>
-                <button
-                  onClick={handleNextRound}
-                  className="px-4 py-2 bg-purple-900/80 text-yellow-100 rounded
-                    border-2 border-purple-800/50 hover:bg-purple-800/80
-                    active:bg-purple-700/80 transition-colors duration-200
-                    font-cinzel shadow-lg hover:shadow-purple-900/50"
-                >
-                  ⚔️ Tour suivant
                 </button>
               </>
             )}
