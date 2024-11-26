@@ -16,6 +16,7 @@ interface PlayerCardProps {
   onSummon: (id: number, duration: number) => void;
   onBleed: (id: number, damage: number) => void;
   onPlayerRemove: (id: number) => void;
+  isActive: boolean;
 }
 
 export default function PlayerCard({ ...props }: PlayerCardProps) {
@@ -49,6 +50,7 @@ export default function PlayerCard({ ...props }: PlayerCardProps) {
       transform transition-all duration-300 hover:scale-[1.02]
       ${props.hp <= 0 ? 'grayscale opacity-75 after:content-["☠️"] after:absolute after:top-1/2 after:left-1/2 after:transform after:-translate-x-1/2 after:-translate-y-1/2 after:text-8xl after:rotate-12 after:transition-opacity after:duration-300' : ''}
       ${isStunned ? 'grayscale' : ''}
+      ${props.isActive ? 'border-4 border-green-500' : ''}
     `}>
       <div className="relative"> {/* Conteneur pour le positionnement */}
         {/* Bouton de suppression */}

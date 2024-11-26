@@ -62,6 +62,21 @@ export default function App() {
     maxHp: 50
   });
 
+  const [turnOrder, setTurnOrder] = useState<(Player | Enemy)[]>([]);
+  const [currentTurnIndex, setCurrentTurnIndex] = useState<number>(0);
+  const [gameStarted, setGameStarted] = useState<boolean>(false);
+  const [currentPlayerName, setCurrentPlayerName] = useState<string>('');
+  const [turnOrderDisplay, setTurnOrderDisplay] = useState<string>('');
+  const [currentRound, setCurrentRound] = useState<number>(1);
+
+  const shuffleArray = (array: any[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+
   useEffect(() => {
     localStorage.setItem('players', JSON.stringify(players));
   }, [players]);
@@ -145,10 +160,20 @@ export default function App() {
     }
   };
 
-  const handleNextTurn = () => {
-    setCurrentTurn(prev => prev + 1);
+  const handleNextPlayer = () => {
+    setCurrentTurnIndex((prevIndex) => {
+      const newIndex = (prevIndex + 1) % turnOrder.length;
+      setCurrentPlayerName(turnOrder[newIndex].name);
+      return newIndex;
+    });
+  };
 
-    // Apply bleed damage to players
+  const handleNextRound = () => {
+    setCurrentRound(prev => prev + 1);
+    setCurrentTurnIndex(0); // Revenir au premier joueur
+    setCurrentPlayerName(turnOrder[0].name);
+
+    // Apply bleed damage and other effects
     setPlayers(players.map(player => ({
       ...player,
       hp: Math.max(0, player.hp - (player.bleedDamage || 0)),
@@ -156,7 +181,6 @@ export default function App() {
       summonDuration: Math.max(0, player.summonDuration - 1)
     })));
 
-    // Apply bleed damage to enemies
     setEnemies(enemies.map(enemy => ({
       ...enemy,
       hp: Math.max(0, enemy.hp - (enemy.bleedDamage || 0)),
@@ -167,7 +191,21 @@ export default function App() {
   const handleReset = () => {
     setPlayers(initialPlayers);
     setEnemies(initialEnemies);
-    setCurrentTurn(1);
+    setCurrentRound(1);
+    setGameStarted(false);
+    setCurrentPlayerName('');
+    setTurnOrderDisplay('');
+    setCurrentTurnIndex(0);
+  };
+
+  const startGame = () => {
+    const combined = [...players, ...enemies];
+    const shuffledOrder = shuffleArray(combined);
+    setTurnOrder(shuffledOrder);
+    setTurnOrderDisplay(shuffledOrder.map(item => item.name).join(', '));
+    setCurrentPlayerName(shuffledOrder[0].name);
+    setGameStarted(true);
+    setCurrentTurnIndex(0);
   };
 
   const handleAddPlayer = () => {
@@ -227,19 +265,52 @@ export default function App() {
               Gestionnaire RPG
             </h1>
             <p className="text-lg text-yellow-100/90 mt-2 font-cinzel">
-              Tour actuel: {currentTurn}
+              Tour actuel: {currentRound}
             </p>
+            {gameStarted && (
+              <>
+                <p className="text-lg text-yellow-100/90 mt-2 font-cinzel">
+                  Tour de jeu: {currentPlayerName}
+                </p>
+                <p className="text-lg text-yellow-100/90 mt-2 font-cinzel">
+                  Ordre de jeu: {turnOrderDisplay}
+                </p>
+              </>
+            )}
           </div>
           <div className="space-x-4">
-            <button
-              onClick={handleNextTurn}
-              className="px-4 py-2 bg-blue-900/80 text-yellow-100 rounded
-                border-2 border-blue-800/50 hover:bg-blue-800/80
-                active:bg-blue-700/80 transition-colors duration-200
-                font-cinzel shadow-lg hover:shadow-blue-900/50"
-            >
-              ⚔️ Tour suivant
-            </button>
+            {!gameStarted ? (
+              <button
+                onClick={startGame}
+                className="px-4 py-2 bg-green-900/80 text-yellow-100 rounded
+                  border-2 border-green-800/50 hover:bg-green-800/80
+                  active:bg-green-700/80 transition-colors duration-200
+                  font-cinzel shadow-lg hover:shadow-green-900/50"
+              >
+                🎲 Commencer le jeu
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={handleNextPlayer}
+                  className="px-4 py-2 bg-blue-900/80 text-yellow-100 rounded
+                    border-2 border-blue-800/50 hover:bg-blue-800/80
+                    active:bg-blue-700/80 transition-colors duration-200
+                    font-cinzel shadow-lg hover:shadow-blue-900/50"
+                >
+                  👤 Prochain joueur
+                </button>
+                <button
+                  onClick={handleNextRound}
+                  className="px-4 py-2 bg-purple-900/80 text-yellow-100 rounded
+                    border-2 border-purple-800/50 hover:bg-purple-800/80
+                    active:bg-purple-700/80 transition-colors duration-200
+                    font-cinzel shadow-lg hover:shadow-purple-900/50"
+                >
+                  ⚔️ Tour suivant
+                </button>
+              </>
+            )}
             <button
               onClick={handleReset}
               className="px-4 py-2 bg-red-900/80 text-yellow-100 rounded
@@ -279,6 +350,7 @@ export default function App() {
               <EnemyCard
                 key={enemy.id}
                 {...enemy}
+                isActive={gameStarted && turnOrder[currentTurnIndex]?.id === enemy.id && turnOrder[currentTurnIndex]?.name === enemy.name}
                 onHpChange={handleEnemyHpChange}
                 onStun={handleEnemyStun}
                 onRemove={handleEnemyRemove}
@@ -297,6 +369,7 @@ export default function App() {
               <PlayerCard
                 key={player.id}
                 {...player}
+                isActive={gameStarted && turnOrder[currentTurnIndex]?.id === player.id && turnOrder[currentTurnIndex]?.name === player.name}
                 onHpChange={handlePlayerHpChange}
                 onManaChange={handleManaChange}
                 onStun={handlePlayerStun}
