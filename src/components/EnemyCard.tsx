@@ -18,6 +18,7 @@ export default function EnemyCard({ ...props }: EnemyCardProps) {
   const [hpAmount, setHpAmount] = useState<number>(10);
   const [stunTurns, setStunTurns] = useState<number>(1);
   const [bleedAmount, setBleedAmount] = useState<number>(1);
+  const [notes, setNotes] = useState<string>('');
   const isStunned = props.stunDuration > 0;
 
   return (
@@ -164,6 +165,15 @@ export default function EnemyCard({ ...props }: EnemyCardProps) {
           >
             🩸 Saignement
           </button>
+        </div>
+        <div className="mt-4">
+          <label className="block text-yellow-100 font-cinzel mb-1">Notes</label>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            className="w-full px-3 py-2 bg-yellow-900/50 text-yellow-100 rounded border-2 border-yellow-800/50 focus:ring-2 focus:ring-yellow-600 focus:outline-none shadow-inner"
+            rows={3}
+          />
         </div>
       </div>
     </div>

@@ -47,7 +47,6 @@ export default function App() {
     const savedEnemies = localStorage.getItem('enemies');
     return savedEnemies ? JSON.parse(savedEnemies) : initialEnemies;
   });
-  const [currentTurn, setCurrentTurn] = useState<number>(1);
   const [showAddPlayer, setShowAddPlayer] = useState(false);
   const [newPlayer, setNewPlayer] = useState({
     name: '',

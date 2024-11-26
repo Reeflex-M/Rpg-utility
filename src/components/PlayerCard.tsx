@@ -26,6 +26,7 @@ export default function PlayerCard({ ...props }: PlayerCardProps) {
   const [summonTurns, setSummonTurns] = useState<number>(1);
   const [bleedAmount, setBleedAmount] = useState<number>(1);
   const [showManaAlert, setShowManaAlert] = useState(false);
+  const [notes, setNotes] = useState<string>('');
 
   const isStunned = props.stunDuration > 0;
 
@@ -78,7 +79,7 @@ export default function PlayerCard({ ...props }: PlayerCardProps) {
                 <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full 
                   text-sm font-cinzel border border-red-200 animate-pulse shadow-sm
                   whitespace-nowrap">
-                  ⚔️ Immobilisé ({props.stunDuration})
+                  ⚔��� Immobilisé ({props.stunDuration})
                 </span>
               )}
               {props.summonDuration > 0 && (
@@ -264,6 +265,16 @@ export default function PlayerCard({ ...props }: PlayerCardProps) {
             >
               🩸 Saignement
             </button>
+          </div>
+
+          <div className="mt-4">
+            <label className="block text-slate-700 font-cinzel mb-1">Notes</label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded border-2 border-slate-200 focus:ring-2 focus:ring-slate-400 focus:outline-none shadow-inner"
+              rows={3}
+            />
           </div>
         </div>
       </div>
