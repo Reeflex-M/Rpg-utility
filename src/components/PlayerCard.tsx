@@ -42,7 +42,7 @@ export default function PlayerCard({ ...props }: PlayerCardProps) {
   return (
     <div className={`
       relative bg-gradient-to-b from-amber-50/95 to-amber-100/90
-      p-8 rounded-lg border-4 border-amber-200/60
+      p-4 rounded-lg border-4 border-amber-200/60
       shadow-[inset_0_0_20px_rgba(0,0,0,0.1)]
       backdrop-blur-sm
       before:content-[''] before:absolute before:inset-0
@@ -79,7 +79,7 @@ export default function PlayerCard({ ...props }: PlayerCardProps) {
                 <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full 
                   text-sm font-cinzel border border-red-200 animate-pulse shadow-sm
                   whitespace-nowrap">
-                  ⚔��� Immobilisé ({props.stunDuration})
+                  ⚔ Immobilisé ({props.stunDuration})
                 </span>
               )}
               {props.summonDuration > 0 && (

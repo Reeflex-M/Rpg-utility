@@ -24,7 +24,7 @@ export default function EnemyCard({ ...props }: EnemyCardProps) {
   return (
     <div className={`
       relative bg-gradient-to-b from-amber-900/80 to-amber-950/90
-      p-8 rounded-lg border-4 border-yellow-900/60
+      p-4 rounded-lg border-4 border-yellow-900/60
       shadow-[inset_0_0_20px_rgba(0,0,0,0.6)]
       backdrop-blur-sm
       before:content-[''] before:absolute before:inset-0

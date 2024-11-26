@@ -280,131 +280,142 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-amber-900/90 to-amber-950/95 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6 bg-gradient-to-b from-amber-900/80 to-amber-950/90 p-6 rounded-lg border-4 border-yellow-900/60 shadow-[inset_0_0_20px_rgba(0,0,0,0.6)]">
-          <div>
-            <h1 className="text-4xl font-medievalsharp text-yellow-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
-              Gestionnaire RPG
-            </h1>
-            <p className="text-lg text-yellow-100/90 mt-2 font-cinzel">
-              Tour actuel: {currentRound}
-            </p>
-            {gameStarted && (
-              <>
-                <p className="text-lg text-yellow-100/90 mt-2 font-cinzel">
-                  Tour de jeu: {currentPlayerName}
-                </p>
-                <p className="text-lg text-yellow-100/90 mt-2 font-cinzel">
-                  Ordre de jeu: {turnOrderDisplay}
-                </p>
-              </>
-            )}
-          </div>
-          <div className="space-x-4">
-            {!gameStarted ? (
-              <button
-                onClick={startGame}
-                className="px-4 py-2 bg-green-900/80 text-yellow-100 rounded
-                  border-2 border-green-800/50 hover:bg-green-800/80
-                  active:bg-green-700/80 transition-colors duration-200
-                  font-cinzel shadow-lg hover:shadow-green-900/50"
-              >
-                🎲 Commencer le jeu
-              </button>
-            ) : (
-              <>
-                <button
-                  onClick={handleNextPlayer}
-                  className="px-4 py-2 bg-blue-900/80 text-yellow-100 rounded
-                    border-2 border-blue-800/50 hover:bg-blue-800/80
-                    active:bg-blue-700/80 transition-colors duration-200
-                    font-cinzel shadow-lg hover:shadow-blue-900/50"
-                >
-                  👤 Prochain joueur
-                </button>
-              </>
-            )}
+    <div className="min-h-screen bg-gradient-to-b from-amber-900/90 to-amber-950/95 flex">
+      {/* Navbar latérale */}
+      <div className="w-64 h-screen bg-gradient-to-b from-amber-900/80 to-amber-950/90 
+        border-r-4 border-yellow-900/60 shadow-[inset_0_0_20px_rgba(0,0,0,0.6)]
+        p-4 flex flex-col fixed left-0 top-0">
+        <div className="mb-8">
+          <h1 className="text-3xl font-medievalsharp text-yellow-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+            Gestionnaire RPG
+          </h1>
+          <p className="text-lg text-yellow-100/90 mt-4 font-cinzel">
+            Tour actuel: {currentRound}
+          </p>
+          {gameStarted && (
+            <>
+              <p className="text-lg text-yellow-100/90 mt-2 font-cinzel">
+                Tour de jeu: {currentPlayerName}
+              </p>
+              <p className="text-sm text-yellow-100/90 mt-2 font-cinzel">
+                Ordre de jeu: {turnOrderDisplay}
+              </p>
+            </>
+          )}
+        </div>
+
+        <div className="flex flex-col gap-3">
+          {!gameStarted ? (
             <button
-              onClick={handleReset}
-              className="px-4 py-2 bg-red-900/80 text-yellow-100 rounded
-                border-2 border-red-800/50 hover:bg-red-800/80
-                active:bg-red-700/80 transition-colors duration-200
-                font-cinzel shadow-lg hover:shadow-red-900/50"
-            >
-              🔄 Réinitialiser
-            </button>
-            <button
-              onClick={() => setShowAddPlayer(true)}
-              className="px-4 py-2 bg-green-900/80 text-yellow-100 rounded
+              onClick={startGame}
+              className="w-full px-4 py-3 bg-green-900/80 text-yellow-100 rounded
                 border-2 border-green-800/50 hover:bg-green-800/80
                 active:bg-green-700/80 transition-colors duration-200
                 font-cinzel shadow-lg hover:shadow-green-900/50"
             >
-              👥 Nouveau Joueur
+              🎲 Commencer le jeu
             </button>
+          ) : (
             <button
-              onClick={() => setShowAddEnemy(true)}
-              className="px-4 py-2 bg-red-900/80 text-yellow-100 rounded
-                border-2 border-red-800/50 hover:bg-red-800/80
-                active:bg-red-700/80 transition-colors duration-200
-                font-cinzel shadow-lg hover:shadow-red-900/50"
+              onClick={handleNextPlayer}
+              className="w-full px-4 py-3 bg-blue-900/80 text-yellow-100 rounded
+                border-2 border-blue-800/50 hover:bg-blue-800/80
+                active:bg-blue-700/80 transition-colors duration-200
+                font-cinzel shadow-lg hover:shadow-blue-900/50"
             >
-              👹 Nouvel Ennemi
+              👤 Prochain joueur
             </button>
-          </div>
+          )}
+          <button
+            onClick={handleReset}
+            className="w-full px-4 py-3 bg-red-900/80 text-yellow-100 rounded
+              border-2 border-red-800/50 hover:bg-red-800/80
+              active:bg-red-700/80 transition-colors duration-200
+              font-cinzel shadow-lg hover:shadow-red-900/50"
+          >
+            🔄 Réinitialiser
+          </button>
+          <button
+            onClick={() => setShowAddPlayer(true)}
+            className="w-full px-4 py-3 bg-green-900/80 text-yellow-100 rounded
+              border-2 border-green-800/50 hover:bg-green-800/80
+              active:bg-green-700/80 transition-colors duration-200
+              font-cinzel shadow-lg hover:shadow-green-900/50"
+          >
+            👥 Nouveau Joueur
+          </button>
+          <button
+            onClick={() => setShowAddEnemy(true)}
+            className="w-full px-4 py-3 bg-red-900/80 text-yellow-100 rounded
+              border-2 border-red-800/50 hover:bg-red-800/80
+              active:bg-red-700/80 transition-colors duration-200
+              font-cinzel shadow-lg hover:shadow-red-900/50"
+          >
+            👹 Nouvel Ennemi
+          </button>
         </div>
+      </div>
 
-        <div className="mb-8">
-          <h2 className="text-3xl font-medievalsharp text-yellow-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mb-4">
-            Ennemis
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {getOrderedCards().enemies.map(enemy => (
-              <div key={enemy.id} className={`
-                ${gameStarted && turnOrder[currentTurnIndex]?.id === enemy.id && !('mana' in turnOrder[currentTurnIndex])
-                  ? 'animate-pulse shadow-[0_0_15px_5px_rgba(34,197,94,0.3)]'
-                  : ''}`}
-              >
-                <EnemyCard
-                  {...enemy}
-                  isActive={gameStarted && turnOrder[currentTurnIndex]?.id === enemy.id && !('mana' in turnOrder[currentTurnIndex])}
-                  onHpChange={handleEnemyHpChange}
-                  onStun={handleEnemyStun}
-                  onRemove={handleEnemyRemove}
-                  onBleed={(id, damage) => handleBleed(id, damage, true)}
-                />
-              </div>
-            ))}
+      {/* Contenu principal */}
+      <div className="ml-64 flex-1 p-4">
+        <div className="max-w-[1800px] mx-auto space-y-4">
+          {/* Section Ennemis */}
+          <div>
+            <h2 className="text-2xl font-medievalsharp text-yellow-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mb-2">
+              Ennemis
+            </h2>
+            <div className="grid grid-cols-4 gap-3">
+              {getOrderedCards().enemies.map(enemy => (
+                <div key={enemy.id} className={`
+                  transform-gpu transition-all duration-300
+                  ${gameStarted && turnOrder[currentTurnIndex]?.id === enemy.id && !('mana' in turnOrder[currentTurnIndex])
+                    ? 'animate-pulse shadow-[0_0_15px_5px_rgba(34,197,94,0.3)]'
+                    : ''}`}
+                >
+                  <EnemyCard
+                    {...enemy}
+                    isActive={gameStarted && turnOrder[currentTurnIndex]?.id === enemy.id && !('mana' in turnOrder[currentTurnIndex])}
+                    onHpChange={handleEnemyHpChange}
+                    onStun={handleEnemyStun}
+                    onRemove={handleEnemyRemove}
+                    onBleed={(id, damage) => handleBleed(id, damage, true)}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div>
-          <h2 className="text-3xl font-medievalsharp text-yellow-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mb-4">
-            Joueurs
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {getOrderedCards().players.map(player => (
-              <div key={player.id} className={`
-                ${gameStarted && turnOrder[currentTurnIndex]?.id === player.id && 'mana' in turnOrder[currentTurnIndex]
-                  ? 'animate-pulse shadow-[0_0_15px_5px_rgba(34,197,94,0.3)]'
-                  : ''}`}
-              >
-                <PlayerCard
-                  {...player}
-                  isActive={gameStarted && turnOrder[currentTurnIndex]?.id === player.id && 'mana' in turnOrder[currentTurnIndex]}
-                  onHpChange={handlePlayerHpChange}
-                  onManaChange={handleManaChange}
-                  onStun={handlePlayerStun}
-                  onSummon={handleSummon}
-                  onPlayerRemove={handlePlayerRemove}
-                  onBleed={(id, damage) => handleBleed(id, damage, false)}
-                />
-              </div>
-            ))}
+          {/* Section Joueurs */}
+          <div>
+            <h2 className="text-2xl font-medievalsharp text-yellow-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mb-2">
+              Joueurs
+            </h2>
+            <div className="grid grid-cols-4 gap-3">
+              {getOrderedCards().players.map(player => (
+                <div key={player.id} className={`
+                  transform-gpu transition-all duration-300
+                  ${gameStarted && turnOrder[currentTurnIndex]?.id === player.id && 'mana' in turnOrder[currentTurnIndex]
+                    ? 'animate-pulse shadow-[0_0_15px_5px_rgba(34,197,94,0.3)]'
+                    : ''}`}
+                >
+                  <PlayerCard
+                    {...player}
+                    isActive={gameStarted && turnOrder[currentTurnIndex]?.id === player.id && 'mana' in turnOrder[currentTurnIndex]}
+                    onHpChange={handlePlayerHpChange}
+                    onManaChange={handleManaChange}
+                    onStun={handlePlayerStun}
+                    onSummon={handleSummon}
+                    onPlayerRemove={handlePlayerRemove}
+                    onBleed={(id, damage) => handleBleed(id, damage, false)}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* ...existing modals code... */}
       {showAddPlayer && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-gradient-to-b from-amber-50/95 to-amber-100/90 p-6 rounded-lg border-4 border-amber-200/60 shadow-lg w-96">
