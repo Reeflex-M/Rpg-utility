@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import PlayerCard from './components/PlayerCard';
 import EnemyCard from './components/EnemyCard';
 
@@ -38,6 +39,17 @@ const initialEnemies: Enemy[] = [
   { id: 4, name: 'Sorcier Noir', hp: 80, maxHp: 80, stunDuration: 0, bleedDamage: 0 },
 ];
 
+const reorder = (list: any[], startIndex: number, endIndex: number) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+  return result;
+};
+
+import { DropResult } from '@hello-pangea/dnd';
+
+type DragEndResult = DropResult;
+
 export default function App() {
   const [players, setPlayers] = useState<Player[]>(() => {
     const savedPlayers = localStorage.getItem('players');
@@ -67,6 +79,10 @@ export default function App() {
   const [currentPlayerName, setCurrentPlayerName] = useState<string>('');
   const [turnOrderDisplay, setTurnOrderDisplay] = useState<string>('');
   const [currentRound, setCurrentRound] = useState<number>(1);
+
+  const [showOrderModal, setShowOrderModal] = useState(false);
+  const [manualOrder, setManualOrder] = useState<(Player | Enemy)[]>([]);
+  const [isManualOrder, setIsManualOrder] = useState(false);
 
   const shuffleArray = (array: any[]) => {
     for (let i = array.length - 1; i > 0; i--) {
@@ -195,16 +211,46 @@ export default function App() {
     setCurrentPlayerName('');
     setTurnOrderDisplay('');
     setCurrentTurnIndex(0);
+    setIsManualOrder(false); // Réinitialiser l'indicateur d'ordre manuel
+    setManualOrder([]); // Réinitialiser l'ordre manuel
   };
 
   const startGame = () => {
-    const combined = [...players, ...enemies];
-    const shuffledOrder = shuffleArray(combined);
-    setTurnOrder(shuffledOrder);
-    setTurnOrderDisplay(shuffledOrder.map(item => item.name).join(', '));
-    setCurrentPlayerName(shuffledOrder[0].name);
+    if (!isManualOrder) {
+      // Si on n'utilise pas l'ordre manuel, on mélange aléatoirement
+      const combined = [...players, ...enemies];
+      const gameOrder = shuffleArray(combined);
+      setTurnOrder(gameOrder);
+      setTurnOrderDisplay(gameOrder.map(item => item.name).join(', '));
+      setCurrentPlayerName(gameOrder[0].name);
+    } else {
+      // Si on utilise l'ordre manuel, on utilise directement manualOrder
+      setTurnOrder(manualOrder);
+      setTurnOrderDisplay(manualOrder.map(item => item.name).join(', '));
+      setCurrentPlayerName(manualOrder[0].name);
+    }
     setGameStarted(true);
     setCurrentTurnIndex(0);
+  };
+
+
+  const onDragEnd = (result: DragEndResult) => {
+    if (!result.destination) {
+      return;
+    }
+
+    const items = reorder(
+      manualOrder,
+      result.source.index,
+      result.destination.index
+    );
+
+    setManualOrder(items);
+  };
+
+  const openOrderModal = () => {
+    setManualOrder([...players, ...enemies]);
+    setShowOrderModal(true);
   };
 
   const handleAddPlayer = () => {
@@ -306,15 +352,26 @@ export default function App() {
 
         <div className="flex flex-col gap-3">
           {!gameStarted ? (
-            <button
-              onClick={startGame}
-              className="w-full px-4 py-3 bg-green-900/80 text-yellow-100 rounded
-                border-2 border-green-800/50 hover:bg-green-800/80
-                active:bg-green-700/80 transition-colors duration-200
-                font-cinzel shadow-lg hover:shadow-green-900/50"
-            >
-              🎲 Commencer le jeu
-            </button>
+            <>
+              <button
+                onClick={openOrderModal}
+                className="w-full px-4 py-3 bg-yellow-900/80 text-yellow-100 rounded
+                  border-2 border-yellow-800/50 hover:bg-yellow-800/80
+                  active:bg-yellow-700/80 transition-colors duration-200
+                  font-cinzel shadow-lg hover:shadow-yellow-900/50"
+              >
+                📋 Configurer l'ordre de jeu
+              </button>
+              <button
+                onClick={startGame}
+                className="w-full px-4 py-3 bg-green-900/80 text-yellow-100 rounded
+                  border-2 border-green-800/50 hover:bg-green-800/80
+                  active:bg-green-700/80 transition-colors duration-200
+                  font-cinzel shadow-lg hover:shadow-green-900/50"
+              >
+                🎲 {isManualOrder ? 'Commencer avec ordre personnalisé' : 'Commencer avec ordre aléatoire'}
+              </button>
+            </>
           ) : (
             <button
               onClick={handleNextPlayer}
@@ -552,6 +609,94 @@ export default function App() {
                 disabled={!newEnemy.name.trim()}
               >
                 Créer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showOrderModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-gradient-to-b from-amber-50/95 to-amber-100/90 p-6 rounded-lg 
+              border-4 border-amber-200/60 shadow-lg w-[600px]">
+            <h2 className="text-2xl font-medievalsharp text-slate-800 mb-4">
+              Configurer l'ordre de jeu
+            </h2>
+
+            <div className="mb-4 text-sm text-slate-600">
+              Glissez et déposez les éléments pour réorganiser l'ordre de jeu
+            </div>
+
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="droppable-list" type="TURN_ORDER">
+                {(provided) => (
+                  <div
+                    {...provided.droppableProps}
+                    ref={provided.innerRef}
+                    className="space-y-2 max-h-[50vh] overflow-y-auto bg-white/50 rounded-lg p-2"
+                  >
+                    {manualOrder.map((entity, index) => {
+                      const id = `${entity.id}-${('mana' in entity ? 'player' : 'enemy')}`;
+                      return (
+                        <Draggable key={id} draggableId={id} index={index}>
+                          {(provided, snapshot) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className={`
+                                flex items-center gap-2 p-3 rounded-lg select-none
+                                ${snapshot.isDragging ? 'bg-amber-100 shadow-lg' : 'bg-white'}
+                                border-2 border-amber-200/60
+                                transform transition-transform duration-200
+                                cursor-grab active:cursor-grabbing
+                              `}
+                            >
+                              <span className="text-amber-800">☰</span>
+                              <span className="font-medievalsharp text-lg">
+                                {index + 1}.
+                              </span>
+                              <span className="flex-grow font-cinzel">
+                                {entity.name}
+                              </span>
+                              {'mana' in entity ? (
+                                <span className="text-blue-600">👤</span>
+                              ) : (
+                                <span className="text-red-600">👹</span>
+                              )}
+                            </div>
+                          )}
+                        </Draggable>
+                      );
+                    })}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
+
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                onClick={() => {
+                  setShowOrderModal(false);
+                  setIsManualOrder(false);
+                }}
+                className="px-4 py-2 bg-slate-500 text-white rounded
+                  hover:bg-slate-600 active:bg-slate-700
+                  transition-colors duration-200 font-cinzel"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => {
+                  setShowOrderModal(false);
+                  setIsManualOrder(true);
+                }}
+                className="px-4 py-2 bg-green-500 text-white rounded
+                  hover:bg-green-600 active:bg-green-700
+                  transition-colors duration-200 font-cinzel"
+              >
+                Confirmer
               </button>
             </div>
           </div>
