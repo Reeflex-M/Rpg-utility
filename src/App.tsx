@@ -78,7 +78,6 @@ export default function App() {
   const [currentTurnIndex, setCurrentTurnIndex] = useState<number>(0);
   const [gameStarted, setGameStarted] = useState<boolean>(false);
   const [currentPlayerName, setCurrentPlayerName] = useState<string>('');
-  const [turnOrderDisplay, setTurnOrderDisplay] = useState<string>('');
   const [currentRound, setCurrentRound] = useState<number>(1);
 
   const [showOrderModal, setShowOrderModal] = useState(false);
@@ -210,7 +209,6 @@ export default function App() {
     setCurrentRound(1);
     setGameStarted(false);
     setCurrentPlayerName('');
-    setTurnOrderDisplay('');
     setCurrentTurnIndex(0);
     setIsManualOrder(false); // Réinitialiser l'indicateur d'ordre manuel
     setManualOrder([]); // Réinitialiser l'ordre manuel
@@ -222,12 +220,10 @@ export default function App() {
       const combined = [...players, ...enemies];
       const gameOrder = shuffleArray(combined);
       setTurnOrder(gameOrder);
-      setTurnOrderDisplay(gameOrder.map(item => item.name).join(', '));
       setCurrentPlayerName(gameOrder[0].name);
     } else {
       // Si on utilise l'ordre manuel, on utilise directement manualOrder
       setTurnOrder(manualOrder);
-      setTurnOrderDisplay(manualOrder.map(item => item.name).join(', '));
       setCurrentPlayerName(manualOrder[0].name);
     }
     setGameStarted(true);
