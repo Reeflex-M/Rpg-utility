@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import PlayerCard from './components/PlayerCard';
 import EnemyCard from './components/EnemyCard';
+import TurnOrderCircle from './components/TurnOrderCircle';
 
 interface Player {
   id: number;
@@ -327,30 +328,56 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-900/90 to-amber-950/95 flex">
-      {/* Navbar latérale */}
-      <div className="w-64 h-screen bg-gradient-to-b from-amber-900/80 to-amber-950/90 
+      {/* Navbar latérale améliorée */}
+      <div className="w-72 h-screen bg-gradient-to-b from-amber-900/80 to-amber-950/90 
         border-r-4 border-yellow-900/60 shadow-[inset_0_0_20px_rgba(0,0,0,0.6)]
-        p-4 flex flex-col fixed left-0 top-0">
-        <div className="mb-8">
-          <h1 className="text-3xl font-medievalsharp text-yellow-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+        p-6 flex flex-col fixed left-0 top-0 z-20">
+        <div className="mb-8 space-y-4">
+          <h1 className="text-4xl font-medievalsharp text-yellow-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]
+            bg-gradient-to-r from-yellow-200 to-yellow-500 bg-clip-text text-transparent">
             Gestionnaire RPG
           </h1>
-          <p className="text-lg text-yellow-100/90 mt-4 font-cinzel">
-            Tour actuel: {currentRound}
-          </p>
-          {gameStarted && (
-            <>
-              <p className="text-lg text-yellow-100/90 mt-2 font-cinzel">
-                Tour de jeu: {currentPlayerName}
-              </p>
-              <p className="text-sm text-yellow-100/90 mt-2 font-cinzel">
-                Ordre de jeu: {turnOrderDisplay}
-              </p>
-            </>
-          )}
+          <div className="bg-gradient-to-r from-amber-950/50 to-amber-900/50 p-4 rounded-lg border border-yellow-900/30">
+            <p className="text-xl text-yellow-100/90 font-cinzel">
+              Tour {currentRound}
+            </p>
+            {gameStarted && (
+              <>
+                <p className="text-lg text-yellow-100/90 mt-2 font-cinzel">
+                  Tour de: <span className="text-yellow-400">{currentPlayerName}</span>
+                </p>
+                {/* Nouvelle section pour l'ordre de jeu */}
+                <div className="mt-4 pt-4 border-t border-yellow-900/30">
+                  <p className="text-sm text-yellow-100/70 mb-2 font-cinzel">Ordre de jeu:</p>
+                  <div className="space-y-1.5 max-h-48 overflow-y-auto pr-2">
+                    {turnOrder.map((entity, index) => (
+                      <div
+                        key={`${entity.id}-${entity.name}-order`}
+                        className={`
+                          flex items-center gap-2 px-3 py-1.5 rounded
+                          ${index === currentTurnIndex ? 'bg-yellow-900/50' : 'bg-yellow-900/20'}
+                          ${('mana' in entity) ? 'text-amber-100' : 'text-yellow-200'}
+                          transition-colors duration-200
+                        `}
+                      >
+                        <span className="text-sm">{index + 1}.</span>
+                        <span className="text-xs">
+                          {('mana' in entity) ? '👤' : '👹'}
+                        </span>
+                        <span className="text-sm font-cinzel truncate">
+                          {entity.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
-        <div className="flex flex-col gap-3">
+        {/* Reste des boutons avec style amélioré */}
+        <div className="flex flex-col gap-4">
           {!gameStarted ? (
             <>
               <button
@@ -413,15 +440,15 @@ export default function App() {
         </div>
       </div>
 
-      {/* Contenu principal */}
-      <div className="ml-64 flex-1 p-4">
-        <div className="max-w-[1800px] mx-auto space-y-4">
+      {/* Contenu principal avec padding ajusté */}
+      <div className="ml-72 flex-1 p-6">
+        <div className="max-w-[1800px] mx-auto space-y-6">
           {/* Section Ennemis */}
           <div>
             <h2 className="text-2xl font-medievalsharp text-yellow-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mb-2">
               Ennemis
             </h2>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-5 gap-2">
               {getOrderedCards().enemies.map(enemy => (
                 <div key={enemy.id} className={`
                   transform-gpu transition-all duration-300
@@ -447,7 +474,7 @@ export default function App() {
             <h2 className="text-2xl font-medievalsharp text-yellow-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] mb-2">
               Joueurs
             </h2>
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-5 gap-2">
               {getOrderedCards().players.map(player => (
                 <div key={player.id} className={`
                   transform-gpu transition-all duration-300
@@ -471,6 +498,14 @@ export default function App() {
           </div>
         </div>
       </div>
+
+      {/* Ajout du cercle des tours */}
+      {gameStarted && (
+        <TurnOrderCircle
+          turnOrder={turnOrder}
+          currentTurnIndex={currentTurnIndex}
+        />
+      )}
 
       {/* ...existing modals code... */}
       {showAddPlayer && (

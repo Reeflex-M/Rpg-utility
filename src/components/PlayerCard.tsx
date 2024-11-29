@@ -102,6 +102,7 @@ export default function PlayerCard({ ...props }: PlayerCardProps) {
           <div className="mb-6 space-y-4">
             <div className="flex items-center justify-between">
               <span className="font-cinzel text-slate-700">Vitalité: {props.hp}/{props.maxHp}</span>
+              <span className="font-cinzel text-slate-700">Mana: {props.mana}/{props.maxMana}</span>
             </div>
 
             <div className="h-3 bg-slate-200 rounded-full border-2 border-slate-300 shadow-inner">
@@ -114,18 +115,15 @@ export default function PlayerCard({ ...props }: PlayerCardProps) {
               />
             </div>
 
-            <div className="flex items-center justify-between"></div>
-            <span className="font-cinzel text-slate-700">Mana: {props.mana}/{props.maxMana}</span>
-          </div>
-
-          <div className="h-3 bg-slate-200 rounded-full border-2 border-slate-300 shadow-inner">
-            <div
-              className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full
+            <div className="h-3 bg-slate-200 rounded-full border-2 border-slate-300 shadow-inner">
+              <div
+                className="h-full bg-gradient-to-r from-blue-400 to-blue-500 rounded-full
                   transition-all duration-300 relative overflow-hidden
                   before:absolute before:inset-0 before:bg-gradient-to-b 
                   before:from-white/20 before:to-transparent"
-              style={{ width: `${(props.mana / props.maxMana) * 100}%` }}
-            />
+                style={{ width: `${(props.mana / props.maxMana) * 100}%` }}
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
@@ -165,16 +163,16 @@ export default function PlayerCard({ ...props }: PlayerCardProps) {
               value={manaAmount}
               onChange={(e) => setManaAmount(Math.max(1, parseInt(e.target.value) || 0))}
               className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded 
-                  border-2 border-slate-200 text-center focus:ring-2 
-                  focus:ring-slate-400 focus:outline-none shadow-inner"
+                    border-2 border-slate-200 text-center focus:ring-2 
+                    focus:ring-slate-400 focus:outline-none shadow-inner"
               min="1"
             />
             <div className="flex gap-2 relative">
               <button
                 onClick={() => handleManaChange(-manaAmount)}
                 className="w-24 px-4 py-2 bg-blue-500 text-white rounded
-                    border hover:bg-blue-600 active:bg-blue-700 
-                    transition-colors duration-200 font-cinzel shadow-sm"
+                      border hover:bg-blue-600 active:bg-blue-700 
+                      transition-colors duration-200 font-cinzel shadow-sm"
                 disabled={isStunned}
               >
                 -{manaAmount}
@@ -182,8 +180,8 @@ export default function PlayerCard({ ...props }: PlayerCardProps) {
               <button
                 onClick={() => handleManaChange(manaAmount)}
                 className="w-24 px-4 py-2 bg-blue-500 text-white rounded
-                    border hover:bg-blue-600 active:bg-blue-700
-                    transition-colors duration-200 font-cinzel shadow-sm"
+                      border hover:bg-blue-600 active:bg-blue-700
+                      transition-colors duration-200 font-cinzel shadow-sm"
                 disabled={isStunned}
               >
                 +{manaAmount}
@@ -192,90 +190,90 @@ export default function PlayerCard({ ...props }: PlayerCardProps) {
               {/* Alerte mana */}
               {showManaAlert && (
                 <div className="absolute -top-16 left-1/2 -translate-x-1/2 
-                    bg-red-100/90 backdrop-blur-sm text-red-800 px-6 py-2 rounded-lg
-                    border-2 border-red-200 font-cinzel text-sm whitespace-nowrap
-                    animate-[fadeInOut_2s_ease-in-out] shadow-lg z-10
-                    before:content-[''] before:absolute before:left-1/2 before:-bottom-2
-                    before:w-4 before:h-4 before:bg-red-100/90 before:rotate-45
-                    before:-translate-x-1/2 before:border-b-2 before:border-r-2
-                    before:border-red-200">
+                      bg-red-100/90 backdrop-blur-sm text-red-800 px-6 py-2 rounded-lg
+                      border-2 border-red-200 font-cinzel text-sm whitespace-nowrap
+                      animate-[fadeInOut_2s_ease-in-out] shadow-lg z-10
+                      before:content-[''] before:absolute before:left-1/2 before:-bottom-2
+                      before:w-4 before:h-4 before:bg-red-100/90 before:rotate-45
+                      before:-translate-x-1/2 before:border-b-2 before:border-r-2
+                      before:border-red-200">
                   ⚡ Mana Insuffisant!
                 </div>
               )}
             </div>
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="number"
-              value={stunTurns}
-              onChange={(e) => setStunTurns(Math.max(1, parseInt(e.target.value) || 0))}
-              className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            type="number"
+            value={stunTurns}
+            onChange={(e) => setStunTurns(Math.max(1, parseInt(e.target.value) || 0))}
+            className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded
                   border-2 border-slate-200 text-center focus:ring-2
                   focus:ring-slate-400 focus:outline-none shadow-inner"
-              min="1"
-            />
-            <button
-              onClick={() => props.onStun(props.id, stunTurns)}
-              className="px-4 py-2 bg-slate-500 text-white rounded
+            min="1"
+          />
+          <button
+            onClick={() => props.onStun(props.id, stunTurns)}
+            className="px-4 py-2 bg-slate-500 text-white rounded
                   border hover:bg-slate-600 active:bg-slate-700
                   transition-colors duration-200 font-cinzel shadow-sm"
-              disabled={isStunned}
-            >
-              🗡️ Immobiliser
-            </button>
-          </div>
+            disabled={isStunned}
+          >
+            🗡️ Immobiliser
+          </button>
+        </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="number"
-              value={summonTurns}
-              onChange={(e) => setSummonTurns(Math.max(1, parseInt(e.target.value) || 0))}
-              className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            type="number"
+            value={summonTurns}
+            onChange={(e) => setSummonTurns(Math.max(1, parseInt(e.target.value) || 0))}
+            className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded
                   border-2 border-slate-200 text-center focus:ring-2
                   focus:ring-slate-400 focus:outline-none shadow-inner"
-              min="1"
-            />
-            <button
-              onClick={() => props.onSummon(props.id, summonTurns)}
-              className="px-4 py-2 bg-purple-500 text-white rounded
+            min="1"
+          />
+          <button
+            onClick={() => props.onSummon(props.id, summonTurns)}
+            className="px-4 py-2 bg-purple-500 text-white rounded
                   border hover:bg-purple-600 active:bg-purple-700
                   transition-colors duration-200 font-cinzel shadow-sm"
-              disabled={isStunned || props.mana < 20}
-            >
-              🌟 Invoquer
-            </button>
-          </div>
+            disabled={isStunned || props.mana < 20}
+          >
+            🌟 Invoquer
+          </button>
+        </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="number"
-              value={bleedAmount}
-              onChange={(e) => setBleedAmount(Math.max(1, parseInt(e.target.value) || 0))}
-              className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded
+        <div className="grid grid-cols-2 gap-2">
+          <input
+            type="number"
+            value={bleedAmount}
+            onChange={(e) => setBleedAmount(Math.max(1, parseInt(e.target.value) || 0))}
+            className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded
                   border-2 border-slate-200 text-center focus:ring-2
                   focus:ring-slate-400 focus:outline-none shadow-inner"
-              min="1"
-            />
-            <button
-              onClick={() => props.onBleed(props.id, bleedAmount)}
-              className="px-4 py-2 bg-red-500 text-white rounded
+            min="1"
+          />
+          <button
+            onClick={() => props.onBleed(props.id, bleedAmount)}
+            className="px-4 py-2 bg-red-500 text-white rounded
                   border hover:bg-red-600 active:bg-red-700
                   transition-colors duration-200 font-cinzel shadow-sm"
-            >
-              🩸 Saignement
-            </button>
-          </div>
+          >
+            🩸 Saignement
+          </button>
+        </div>
 
-          <div className="mt-4">
-            <label className="block text-slate-700 font-cinzel mb-1">Notes</label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded border-2 border-slate-200 focus:ring-2 focus:ring-slate-400 focus:outline-none shadow-inner"
-              rows={3}
-            />
-          </div>
+        <div className="mt-4">
+          <label className="block text-slate-700 font-cinzel mb-1">Notes</label>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            className="w-full px-3 py-2 bg-slate-100 text-slate-800 rounded border-2 border-slate-200 focus:ring-2 focus:ring-slate-400 focus:outline-none shadow-inner"
+            rows={3}
+          />
         </div>
       </div>
     </div>
